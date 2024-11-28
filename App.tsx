@@ -1,20 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
+import TodoListSQLite from "./ToDoListSQLite/TodoListSQLite";
+
+async function initializeDB(db: SQLiteDatabase) {
+  try {
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY NOT NULL, value TEXT NOT NULL, sort_order INTEGER, completed BOOLEAN NOT NULL);
+    `);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SQLiteProvider databaseName="todoList" onInit={initializeDB}>
+      <TodoListSQLite />
+    </SQLiteProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
